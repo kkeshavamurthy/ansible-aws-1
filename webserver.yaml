@@ -1,0 +1,29 @@
+---
+- hosts: tag_{{ tag }}_{{ value }}
+  become: yes
+  user: ec2-user
+  gather_facts: no
+
+  vars:
+    tag: Environment
+    value: Staging
+
+  tasks:
+    - name: Install apache webserver
+      yum:
+        name: httpd
+        state: present
+
+    - name: Download file from S3
+      get_url: 
+        dest: /var/www/html/index.html
+        url: https://s3.amazonaws.com/kk-ansible-bucket/index.html
+        force: yes
+      notify:
+      - restart httpd
+
+  handlers:
+    - name: restart httpd
+      service: 
+        name: httpd
+        state: restarted

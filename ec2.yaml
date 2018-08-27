@@ -1,0 +1,37 @@
+---
+
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+
+  vars:
+    aws_region: us-east-1
+    aws_availabilityzone: us-east-1a
+    ami_id: ami-04681a1dbd79675a5
+    security_group: DMZ
+    tag: Environment
+    tag_value: Staging
+    key_name: kk-2
+    instance_type: t2.micro
+    vpc_subnet_id: subnet-db440cf4
+
+  tasks:
+    - name: Provision an EC2 instance
+      ec2:
+        key_name: "{{ key_name }}"
+        assign_public_ip: yes
+        count: 1
+        group: "{{ security_group }}"
+        image: "{{ ami_id }}"
+        instance_type: "{{ instance_type }}"
+        region: "{{ aws_region }}"
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
+        wait: yes
+        wait_timeout: 300
+        zone: "{{ aws_availabilityzone }}"
+        instance_tags:
+          Name: "{{ tag }}"
+          Environment: "{{ tag_value }}"
+      register: ec2_info
+
+    - debug: var=ec2_info

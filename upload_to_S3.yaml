@@ -1,0 +1,19 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+
+  vars:
+    dir_path: /home/vagrant/ansible-aws-1/
+    file_name: index.html
+    bucket_name: kk-ansible-bucket
+ 
+  tasks:
+    - name: Upload index.html to s3
+      aws_s3:
+        bucket: "{{ bucket_name }}"
+        src: "{{ dir_path }}{{file_name}}"
+        object: /index.html
+        mode: put
+        overwrite: yes
+        permission: public-read
